@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Técnica | Base de Datos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a2980;
+            --accent: #AB096A;
+            --light: #f4f6f9;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--light); padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        
+        button { 
+            background: linear-gradient(135deg, var(--primary), #26d0ce); 
+            color: white; border: none; padding: 10px 20px; 
+            border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%;
+        }
+        button:hover { opacity: 0.9; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+        th { background-color: var(--primary); color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        
+        /* Responsive para móviles */
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <h1 style="text-align: center; color: var(--primary);">Panel de Gestión Técnica</h1>
+    
+    <div class="container">
+        <div class="card">
+            <h2><i class="fas fa-server"></i> 1. Registrar Equipo</h2>
+            <form id="formEquipo">
+                <div class="form-group">
+                    <label>Nombre del Equipo</label>
+                    <input type="text" id="nombreEquipo" placeholder="Ej: Grabador MDVR" required>
+                </div>
+                <div class="form-group">
+                    <label>ID Especialidad</label>
+                    <input type="number" id="idEspecialidad" value="1" required>
+                    <small style="color: grey;">(Número entero referencial)</small>
+                </div>
+                <button type="submit">Guardar Equipo</button>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Equipo</th>
+                        <th>Especialidad</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaEquipos"></tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-microchip"></i> 2. Registrar Elementos</h2>
+            <form id="formElemento">
+                <div class="form-group">
+                    <label>Pertenece al Equipo:</label>
+                    <select id="selectEquipo" required>
+                        <option value="">Cargando equipos...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nombre del Elemento</label>
+                    <input type="text" id="nombreElemento" placeholder="Ej: Tarjeta SIM, Antena" required>
+                </div>
+                <button type="submit">Guardar Elemento</button>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Elemento</th>
+                        <th>Equipo Padre</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaElementos"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://192.168.1.44:5000/api';
+
+        // --- FUNCIONES PARA EQUIPOS ---
+        async function cargarEquipos() {
+            try {
+                const res = await fetch(`${API_URL}/equipos`);
+                const equipos = await res.json();
+                
+                // 1. Llenar tabla
+                const tbody = document.getElementById('tablaEquipos');
+                tbody.innerHTML = '';
+                
+                // 2. Llenar el Select de la otra tarjeta
+                const select = document.getElementById('selectEquipo');
+                select.innerHTML = '<option value="">Seleccione un equipo...</option>';
+
+                equipos.forEach(eq => {
+                    // Tabla
+                    tbody.innerHTML += `<tr><td>${eq.id}</td><td>${eq.equipo}</td><td>${eq.id_especialidad}</td></tr>`;
+                    // Select
+                    select.innerHTML += `<option value="${eq.id}">${eq.equipo}</option>`;
+                });
+            } catch (error) { console.error("Error cargando equipos", error); }
+        }
+
+        document.getElementById('formEquipo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                equipo: document.getElementById('nombreEquipo').value,
+                id_especialidad: document.getElementById('idEspecialidad').value
+            };
+
+            await fetch(`${API_URL}/equipos`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            document.getElementById('formEquipo').reset();
+            cargarEquipos(); // Recargar listas
+            alert("Equipo guardado");
+        });
+
+        // --- FUNCIONES PARA ELEMENTOS ---
+        async function cargarElementos() {
+            try {
+                const res = await fetch(`${API_URL}/elementos`);
+                const elementos = await res.json();
+                
+                const tbody = document.getElementById('tablaElementos');
+                tbody.innerHTML = '';
+                
+                elementos.forEach(el => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${el.id}</td>
+                            <td><strong>${el.elemento}</strong></td>
+                            <td>${el.nombre_equipo || 'Desconocido'}</td>
+                        </tr>`;
+                });
+            } catch (error) { console.error("Error cargando elementos", error); }
+        }
+
+        document.getElementById('formElemento').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                id_equipo: document.getElementById('selectEquipo').value,
+                elemento: document.getElementById('nombreElemento').value
+            };
+
+            await fetch(`${API_URL}/elementos`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            document.getElementById('nombreElemento').value = ''; // Limpiar solo el nombre
+            cargarElementos();
+            alert("Elemento agregado");
+        });
+
+        // INICIALIZAR
+        cargarEquipos();
+        cargarElementos();
+    </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Reporte Técnico</title>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+            <style>
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f4f4; padding: 20px; }
+                .page { background: white; max-width: 900px; margin: 0 auto; padding: 40px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+                h1 { color: #1a2980; border-bottom: 2px solid #26d0ce; padding-bottom: 10px; }
+                h2 { color: #555; font-size: 1.2rem; margin-top: 30px; }
+                .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+                .kpi-row { display: flex; gap: 20px; margin-bottom: 30px; }
+                .kpi-card { flex: 1; background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #1a2980; }
+                .kpi-num { font-size: 2rem; font-weight: bold; color: #1a2980; }
+                
+                /* Gráficas */
+                .charts-container { display: flex; gap: 20px; margin-bottom: 30px; }
+                .chart-box { flex: 1; height: 250px; }
+
+                /* Tabla */
+                table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+                th { background: #1a2980; color: white; padding: 10px; text-align: left; }
+                td { border-bottom: 1px solid #ddd; padding: 8px; }
+                tr:nth-child(even) { background: #f9f9f9; }
+                
+                .badge { padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; color: white; background: #777; }
+                .badge.resuelto { background: #27ae60; }
+                .badge.abierto { background: #c0392b; }
+
+                /* Botón Flotante */
+                .btn-download { 
+                    position: fixed; bottom: 20px; right: 20px; 
+                    background: #c0392b; color: white; 
+                    padding: 15px 25px; border-radius: 50px; 
+                    text-decoration: none; font-weight: bold; 
+                    box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; border: none;
+                }
+                .btn-download:hover { background: #a93226; }
+            </style>
+        </head>
+        <body>
+            <button class="btn-download" onclick="downloadPDF()">⬇ DESCARGAR PDF</button>
+
+            <div class="page" id="reporte-pdf">
+                <div class="header">
+                    <div>
+                        <h1>Reporte de Incidencias</h1>
+                        <p>INSITRA - Sistema de Gestión</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <p><strong>Fecha Generación:</strong> 22/01/2026</p>
+                        <p><strong>Periodo:</strong> 2026-01-15 al 2026-01-22</p>
+                        <p><strong>Técnico:</strong> Sabrina Michaus</p>
+                    </div>
+                </div>
+
+                <div class="kpi-row">
+                    <div class="kpi-card">
+                        <div>Total Atenciones</div>
+                        <div class="kpi-num">5</div>
+                    </div>
+                    <div class="kpi-card" style="border-color: #27ae60;">
+                        <div>Resueltos</div>
+                        <div class="kpi-num" style="color: #27ae60;">0</div>
+                    </div>
+                    <div class="kpi-card" style="border-color: #c0392b;">
+                        <div>Top Falla</div>
+                        <div style="font-size: 1.1rem; font-weight: bold; color: #c0392b; margin-top: 5px;">
+                            No enciende
+                        </div>
+                    </div>
+                </div>
+
+                <h2>📊 Análisis Visual</h2>
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <canvas id="chartEstados"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="chartFallas"></canvas>
+                    </div>
+                </div>
+
+                <h2>📋 Detalle de Registros</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Bus</th><th>Falla</th><th>Solución</th><th>Técnico</th><th>Estado</th><th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr>
+                        <td>11</td>
+                        <td>6</td>
+                        <td>Sonido distorsionado</td>
+                        <td>Remplazo de refacción</td>
+                        <td>Sabrina Michaus</td>
+                        <td><span class='badge abierto'>abierto</span></td>
+                        <td>2026-01-19</td>
+                    </tr><tr>
+                        <td>6</td>
+                        <td>7</td>
+                        <td>Equipo pasmado</td>
+                        <td>En espera de atención</td>
+                        <td>Sabrina Michaus</td>
+                        <td><span class='badge abierto'>ABIERTO</span></td>
+                        <td>2026-01-19</td>
+                    </tr><tr>
+                        <td>10</td>
+                        <td>68</td>
+                        <td>No enciende</td>
+                        <td>Remplazo de refacción</td>
+                        <td>Sabrina Michaus</td>
+                        <td><span class='badge espera_refaccion'>ESPERA_REFACCION</span></td>
+                        <td>2026-01-19</td>
+                    </tr><tr>
+                        <td>9</td>
+                        <td>68</td>
+                        <td>No enciende</td>
+                        <td>Cambio</td>
+                        <td>Sabrina Michaus</td>
+                        <td><span class='badge espera_refaccion'>ESPERA_REFACCION</span></td>
+                        <td>2026-01-19</td>
+                    </tr><tr>
+                        <td>7</td>
+                        <td>98</td>
+                        <td>No envía Ubicación</td>
+                        <td>Ajuste de angulo</td>
+                        <td>Sabrina Michaus</td>
+                        <td><span class='badge espera_refaccion'>ESPERA_REFACCION</span></td>
+                        <td>2026-01-19</td>
+                    </tr></tbody>
+                </table>
+            </div>
+
+            <script>
+                // 1. CONFIGURACIÓN DE GRÁFICAS
+                const ctx1 = document.getElementById('chartEstados');
+                const ctx2 = document.getElementById('chartFallas');
+
+                new Chart(ctx1, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['abierto', 'ABIERTO', 'ESPERA_REFACCION'],
+                        datasets: [{ 
+                            data: [1, 1, 3],
+                            backgroundColor: ['#27ae60', '#f1c40f', '#c0392b', '#2980b9']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Estado de Tickets' } } }
+                });
+
+                new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ['No enciende', 'Sonido distorsionado', 'Equipo pasmado', 'No envía Ubicación'],
+                        datasets: [{ 
+                            label: 'Frecuencia',
+                            data: [2, 1, 1, 1],
+                            backgroundColor: '#1a2980'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Top 5 Fallas' } } }
+                });
+
+                // 2. FUNCIÓN DESCARGAR PDF
+                function downloadPDF() {
+                    const element = document.getElementById('reporte-pdf');
+                    const opt = {
+                        margin:       0.5,
+                        filename:     'Reporte_Insitra.pdf',
+                        image:        { type: 'jpeg', quality: 0.98 },
+                        html2canvas:  { scale: 2 },
+                        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                    };
+                    // Ocultamos el botón antes de imprimir
+                    document.querySelector('.btn-download').style.display = 'none';
+                    
+                    html2pdf().set(opt).from(element).save().then(function() {
+                        document.querySelector('.btn-download').style.display = 'block';
+                    });
+                }
+            </script>
+        </body>
+        </html>
+        

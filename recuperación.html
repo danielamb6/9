@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - Sistema de Incidencias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1a2980;
+            --secondary-blue: #26d0ce;
+            --accent-color: #AB096A;
+            --white: #ffffff;
+            --light-gray: #f4f6f9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Arial", sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #0f1c55 100%);
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+        }
+
+        .recovery-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 25px;
+        }
+
+        .logo-container i {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 50%;
+        }
+
+        h2 { color: var(--primary-blue); margin-bottom: 10px; }
+        p { color: #666; margin-bottom: 30px; font-size: 0.95rem; line-height: 1.5; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(38, 208, 206, 0.1);
+        }
+
+        .btn-recover {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-recover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 41, 128, 0.3);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .back-link:hover { color: var(--accent-color); }
+        .back-link i { margin-right: 5px; }
+
+        /* Mensaje de alerta (oculto por defecto) */
+        .alert-message {
+            display: none;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    </style>
+</head>
+<body>
+
+    <div class="recovery-card">
+        <div class="logo-container">
+            <i class="fas fa-lock-open"></i>
+        </div>
+        <h2>¿Olvidaste tu contraseña?</h2>
+        <p>No te preocupes. Ingresa tu correo electrónico registrado y te enviaremos instrucciones para restablecerla.</p>
+
+        <div id="mensaje-alerta" class="alert-message"></div>
+
+        <form onsubmit="enviarSolicitud(event)">
+            <div class="form-group">
+                <label for="email">Correo Electrónico</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" class="form-control" placeholder="ejemplo@correo.com" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-recover">
+                <i class="fas fa-paper-plane"></i> Enviar Instrucciones
+            </button>
+        </form>
+
+        <a href="login.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Volver al Inicio de Sesión
+        </a>
+    </div>
+
+    <script>
+        function enviarSolicitud(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const alerta = document.getElementById('mensaje-alerta');
+
+            // Simulación de envío
+            // Aquí conectarías con tu backend: fetch('/api/recuperar-password', ...)
+            
+            if(email) {
+                // Mostrar estado de carga (opcional)
+                const btn = document.querySelector('.btn-recover');
+                const textoOriginal = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    // Éxito simulado
+                    alerta.className = 'alert-message alert-success';
+                    alerta.innerHTML = '<i class="fas fa-check-circle"></i> Correo enviado. Revisa tu bandeja de entrada.';
+                    alerta.style.display = 'block';
+                    
+                    btn.innerHTML = textoOriginal;
+                    btn.disabled = false;
+                    document.getElementById('email').value = ''; // Limpiar campo
+                }, 1500);
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio de Sesión | Admin Incidencias</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { 
+            box-sizing: border-box; 
+            font-family: "Arial", Arial, serif; 
+        }
+
+        body {
+            height: 100vh;
+            margin: 0;
+            background: #122db3;
+            background: radial-gradient(circle, rgba(18, 45, 179, 1) 0%, rgba(19, 25, 56, 1) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: white;
+            width: 380px;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background-color: #122db3;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-login:hover {
+            background-color: #2980b9;
+        }
+
+        /* ESTILO NUEVO PARA RECUPERAR CONTRASEÑA */
+        .forgot-password {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .forgot-password a {
+            color: #122db3;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+            color: #AB096A;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo-container">
+            <img src="Sistema de incidencias.png" alt="Logo Empresa" width="200" onerror="this.style.display='none'; this.parentElement.innerHTML='<h2>Sistema Incidencias</h2>'">
+        </div>
+
+        <div class="error" id="error-msg">
+            Usuario o contraseña incorrectos
+        </div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label>Correo electrónico</label>
+                <input type="email" id="email" placeholder="admin@incidencias.com" required>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="password" placeholder="********" required>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Ingresar
+            </button>
+        </form>
+
+        <div class="forgot-password">
+            <a href="recuperar_password.html"><i class="fas fa-lock"></i> ¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <div class="footer-text">
+            © 2026 Panel de Incidencias
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            // Validación temporal (frontend)
+            if (email === "admin@incidencias.com" && password === "admin123") {
+                // Guardar sesión simple
+                localStorage.setItem('sesion', JSON.stringify({ nombre: 'Administrador' }));
+                window.location.href = "index2.html";
+            } else {
+                document.getElementById("error-msg").style.display = "block";
+            }
+        });
+    </script>
+
+</body>
+</html>
